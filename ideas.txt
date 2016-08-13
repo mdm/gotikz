@@ -1,0 +1,10 @@
+* save current position without marks
+* start with saved position
+* mark stones in existing position
+* clip and autoclip
+* command for adding groups of stones
+* command for adding marked stones
+* command for alternating unmarked stones
+* command for alternating numbered stones
+* command for adding board marks (letters)
+* variable coordinates western/asian style

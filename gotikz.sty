@@ -1,0 +1,21 @@
+\NeedsTeXFormat{LaTeX2e}%
+\ProvidesPackage{gotikz}[2016/08/12 v0.1 gotikz.sty%
+                 - Copyright (C) 2016 by Marc Dominik Migge]%
+\RequirePackage{ifthen}%
+\RequirePackage{tikz}%
+\newcommand{\GT@diagramwidth}{}%
+\newcommand{\GT@boardsize}{}%
+\newenvironment{godiagram}[2][19]%
+{%
+    \renewcommand{\GT@boardsize}{#1}%
+    \renewcommand{\GT@diagramwidth}{#2}%
+}%
+{% 
+    \begin{minipage}{\GT@diagramwidth}%
+        \begin{tikzpicture}[scale = \GT@diagramwidth / \GT@boardsize / 1cm]%
+            \draw [red] (-0.5, -0.5) rectangle (\GT@boardsize - 0.5, \GT@boardsize - 0.5);%
+            \draw (0, 0) grid [step = 1] (\GT@boardsize - 1, \GT@boardsize - 1);%
+            \filldraw [fill = white, draw = black] (0, 2) circle [radius = 0.5cm];%
+        \end{tikzpicture}%
+    \end{minipage}%
+}%

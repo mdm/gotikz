@@ -3,19 +3,38 @@
                  - Copyright (C) 2016 by Marc Dominik Migge]%
 \RequirePackage{ifthen}%
 \RequirePackage{tikz}%
+%
 \newcommand{\GT@diagramwidth}{}%
 \newcommand{\GT@boardsize}{}%
+%
+% command to draw star point
+%
 \newenvironment{godiagram}[2][19]%
 {%
     \renewcommand{\GT@boardsize}{#1}%
     \renewcommand{\GT@diagramwidth}{#2}%
 }%
 {% 
-    \begin{minipage}{\GT@diagramwidth}%
+%    \begin{minipage}{\GT@diagramwidt%
         \begin{tikzpicture}[scale = \GT@diagramwidth / \GT@boardsize / 1cm]%
+            \clip (-0.5,-0.5) rectangle (7.5, 7.5);% use size of this rectangle for scaling
+%
             \draw [red] (-0.5, -0.5) rectangle (\GT@boardsize - 0.5, \GT@boardsize - 0.5);%
             \draw (0, 0) grid [step = 1] (\GT@boardsize - 1, \GT@boardsize - 1);%
-            \filldraw [fill = white, draw = black] (0, 2) circle [radius = 0.5cm];%
+            \draw [very thick] (0, 0) rectangle (\GT@boardsize - 1, \GT@boardsize - 1);%
+%
+            \filldraw [black] (9, 9) circle [radius = 3pt];%
+            \filldraw [black] (3, 3) circle [radius = 3pt];%
+            \filldraw [black] (3, 15) circle [radius = 3pt];%
+            \filldraw [black] (15, 3) circle [radius = 3pt];%
+            \filldraw [black] (15, 15) circle [radius = 3pt];%
+%
+            \filldraw [fill = white, draw = black] (0, 1) circle [radius = 0.5cm - 0.5pt];%
+            \filldraw [fill = white, draw = black] (1, 1) circle [radius = 0.5cm - 0.5pt];%
+            \filldraw [fill = white, draw = black] (2, 1) circle [radius = 0.5cm - 0.5pt];%
+            \filldraw [fill = white, draw = black] (3, 1) circle [radius = 0.5cm - 0.5pt];%
+            \filldraw [fill = white, draw = black] (3, 0) circle [radius = 0.5cm - 0.5pt];%
+            \filldraw [fill = black, draw = black] (1, 0) circle [radius = 0.5cm - 0.5pt];%
         \end{tikzpicture}%
-    \end{minipage}%
+%    \end{minipage}%
 }%

@@ -8,3 +8,5 @@
 * command for alternating numbered stones
 * command for adding board marks (letters)
 * variable coordinates western/asian style
+
+* check for stones with \expandafter\ifx\getstone\white

@@ -1,0 +1,30 @@
+%\catcode`@=11 % save previous catcode
+
+%%% appearrance
+\pgfkeys{/gotikz/boardsize/.default=19}
+\pgfkeys{/gotikz/stonesize/.default=1cm}
+\pgfkeys{/gotikz/linewidth/.default=1pt}
+\pgfkeys{/gotikz/borderwidth/.default=2pt}
+\pgfkeys{/gotikz/starpointsize/.default=6pt}
+\pgfkeys{/gotikz/cliprect/.default={(0,0),(18,18)}}
+
+%%% behaviour
+\pgfkeys{/gotikz/overwrite/.default=false}
+
+\pgfkeys{/gotikz/stones/.default={(5, 7)/white, (0, 18)/white, (18, 0)/white, (9, 9)/white, (7, 11)/black, (8, 11)/black, (8, 11)/black}}
+\pgfkeys{/gotikz/stones/.code=\def\mystones{#1}}
+%\pgfkeys{/gotikz/stones/.default={}}
+%\pgfkeys{/gotikz/marks/number}
+%\pgfkeys{/gotikz/marks/triangle}
+
+\def\gotikz@values@white{w}
+\def\gotikz@values@black{b}
+\def\gotikz@values@triangle{-1}
+\def\gotikz@values@square{-2}
+
+\def\gotikz@setstone#1#2#3#4{\expandafter\def\csname gotikz@stone@#1;#2;#3\endcsname{#4}}
+\def\gotikz@getstone#1#2#3{\csname gotikz@stone@#1;#2;#3\endcsname}
+\def\gotikz@setmark#1#2#3#4{\expandafter\def\csname gotikz@mark@#1;#2;#3\endcsname{#4}}
+\def\gotikz@getmark#1#2#3{\csname gotikz@mark@#1;#2;#3\endcsname}
+
+%\catcode`@=12

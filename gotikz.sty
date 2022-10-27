@@ -3,6 +3,9 @@
                  - Copyright (C) 2016 by Marc Dominik Migge]%
 \RequirePackage{ifthen}%
 \RequirePackage{tikz}%
+\usetikzlibrary{shapes.geometric}
+
+\input gotikz.tex
 %
 \newcommand{\GT@diagramwidth}{}%
 \newcommand{\GT@boardsize}{}%
@@ -17,7 +20,7 @@
 {% 
 %    \begin{minipage}{\GT@diagramwidt%
         \begin{tikzpicture}[scale = \GT@diagramwidth / \GT@boardsize / 1cm]%
-            \clip (-0.5,-0.5) rectangle (7.5, 7.5);% use size of this rectangle for scaling
+            %\clip (-0.5, -0.5) rectangle (7.5, 7.5);% use size of this rectangle for scaling
 %
             \draw [red] (-0.5, -0.5) rectangle (\GT@boardsize - 0.5, \GT@boardsize - 0.5);%
             \draw (0, 0) grid [step = 1] (\GT@boardsize - 1, \GT@boardsize - 1);%
@@ -29,12 +32,42 @@
             \filldraw [black] (15, 3) circle [radius = 3pt];%
             \filldraw [black] (15, 15) circle [radius = 3pt];%
 %
-            \filldraw [fill = white, draw = black] (0, 1) circle [radius = 0.5cm - 0.5pt];%
-            \filldraw [fill = white, draw = black] (1, 1) circle [radius = 0.5cm - 0.5pt];%
-            \filldraw [fill = white, draw = black] (2, 1) circle [radius = 0.5cm - 0.5pt];%
-            \filldraw [fill = white, draw = black] (3, 1) circle [radius = 0.5cm - 0.5pt];%
-            \filldraw [fill = white, draw = black] (3, 0) circle [radius = 0.5cm - 0.5pt];%
-            \filldraw [fill = black, draw = black] (1, 0) circle [radius = 0.5cm - 0.5pt];%
+            %\filldraw [fill = white, draw = black] (0, 1) circle [radius = 0.5cm - 0.5pt];%
+            %\filldraw [fill = white, draw = black] (1, 1) circle [radius = 0.5cm - 0.5pt];%
+            %\filldraw [fill = white, draw = black] (2, 1) circle [radius = 0.5cm - 0.5pt];%
+            %\filldraw [fill = white, draw = black] (3, 1) circle [radius = 0.5cm - 0.5pt];%
+            %\filldraw [fill = white, draw = black] (3, 0) circle [radius = 0.5cm - 0.5pt];%
+            %\pgfkeys{/gotikz/stones}
+            %\pgfkeys{/gotikz/stones/.get=\mystones}
+            %\foreach \stonepos/\stonecol in {(5,7)/red,(0,18)/white,(18,0)/white,(9,9)/white,(7,11)/black,(8,11)/black}
+            %\def\mystones{\pgfkeys{/gotikz/stones}}
+            %\gotikz@setstone{default}{9}{9}{\gotikz@values@white}
+            \gotikz@setstone{default}{3}{3}{\gotikz@values@white}
+            \gotikz@setmark{default}{3}{3}{\gotikz@values@triangle}
+            \gotikz@setstone{default}{4}{4}{\gotikz@values@white}
+            \gotikz@setmark{default}{4}{4}{\gotikz@values@square}
+            \foreach \y in {0,...,18} {
+                \foreach \x in {0,...,18} {
+                    %\immediate\write20{xx\gotikz@getstone{default}{\x}{\y}yy}
+                    %\immediate\write20{aa\gotikz@values@white bb}
+                    %\tracingcommands=2
+                    %\tracingmacros=2
+                    %\immediate\write20{\meaning \gotikz@getstone{default}\x\y}
+                    \if\gotikz@values@white\gotikz@getstone{default}\x\y
+                        \filldraw [fill = white, draw = black] (\x,\y) circle [radius = 0.5cm - 0.5pt];%
+                        \expandafter\ifnum\gotikz@getmark{default}\x\y=\gotikz@values@triangle\relax
+                            \draw [draw = black] (\x,\y)+(90:0.5cm - 0.05cm) -- +(210:0.5cm - 0.05cm) -- +(330:0.5cm - 0.05cm) -- cycle;
+                        \else
+                        \expandafter\ifnum\gotikz@getmark{default}\x\y=\gotikz@values@square\relax
+                            \draw [draw = black] (\x,\y)+(45:0.5cm - 0.05cm) -- +(135:0.5cm - 0.05cm) -- +(225:0.5cm - 0.05cm) -- +(315:0.5cm - 0.05cm) -- cycle;
+                        \else
+                        \fi\fi
+                    \else
+                    \fi
+                    \tracingmacros=0
+                    \tracingcommands=0
+                }
+            }
         \end{tikzpicture}%
 %    \end{minipage}%
 }%

@@ -1,4 +1,4 @@
-%\catcode`@=11 % save previous catcode
+%\catcode`@=11%
 
 %%% appearrance
 \pgfkeys{/gotikz/boardsize/.default=19}
@@ -27,4 +27,64 @@
 \def\gotikz@setmark#1#2#3#4{\expandafter\def\csname gotikz@mark@#1;#2;#3\endcsname{#4}}
 \def\gotikz@getmark#1#2#3{\csname gotikz@mark@#1;#2;#3\endcsname}
 
-%\catcode`@=12
+
+%\newcount\gotikz@tmpcounta
+
+\def\gotikz@empty{\gotikz@empty}
+
+\gdef\gotikz@currentdiagram@size{19}
+\gdef\gotikz@currentdiagram@blackstones{\gotikz@empty}
+
+\def\gotikz@coordinates@letterinrange #1(#2-#3)\iftrue{%
+   \ifnum 1=\numexpr 0%
+      \ifnum`#1<\numexpr`#3+1\relax
+        \ifnum`#1>\numexpr`#2-1\relax 1\fi\fi \relax
+}
+
+\def\gotikz@coordinates@convertletter#1{%
+   \gotikz@coordinates@letterinrange#1(a-z)\iftrue \the\numexpr`#1-`a+1\relax-%
+   \else \gotikz@coordinates@letterinrange#1(A-Z)\iftrue \the\numexpr`#1-`A+27\relax-%
+         \else #1%
+   \fi\fi
+}
+
+
+\def\gotikz@coordinates@internalrepr#1-#2/#3/{%
+    \the\numexpr#1-1\relax/\the\numexpr#2-1\relax/#3%
+}
+
+\def\black#1{%
+    \foreach \stone in {#1} {%
+        \edef\stone{\expandafter\gotikz@coordinates@convertletter\stone}%
+        \edef\stone{\expandafter\gotikz@coordinates@internalrepr\stone/none/}%
+        \xdef\gotikz@currentdiagram@blackstones{%
+            \ifx\gotikz@currentdiagram@blackstones\gotikz@empty
+                \stone
+            \else
+                \gotikz@currentdiagram@blackstones,\stone
+            \fi
+        }%
+    }%
+}
+
+\def\showdiagram{%
+    \tikzpicture[scale = 8cm / \gotikz@currentdiagram@size / 1cm]
+        % board
+        \draw (0, 0) grid [step = 1] (\gotikz@currentdiagram@size - 1, \gotikz@currentdiagram@size - 1);
+        \draw [very thick] (0, 0) rectangle (\gotikz@currentdiagram@size - 1, \gotikz@currentdiagram@size - 1);
+
+        % hoshi
+        \filldraw [black] (9, 9) circle [radius = 3pt];
+        \filldraw [black] (3, 3) circle [radius = 3pt];
+        \filldraw [black] (3, 15) circle [radius = 3pt];
+        \filldraw [black] (15, 3) circle [radius = 3pt];
+        \filldraw [black] (15, 15) circle [radius = 3pt];
+
+        % black stones
+        \foreach \x/\y/\mark in \gotikz@currentdiagram@blackstones {
+            \filldraw [black] (\x,\y) circle [radius = 0.5cm - 0.5pt];
+        }
+    \endtikzpicture
+}
+
+%\catcode`@=12%

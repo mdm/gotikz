@@ -69,8 +69,10 @@
 
 \def\showdiagram{%
     \tikzpicture[scale = 8cm / \gotikz@currentdiagram@size / 1cm]
+    % \tikzpicture
         % board
-        \draw (0, 0) grid [step = 1] (\gotikz@currentdiagram@size - 1, \gotikz@currentdiagram@size - 1);
+        % \clip(-0.1, -0.1) rectangle (4.6, 4.6);
+        \draw (0, 0) grid [very thin, step = 1] (\gotikz@currentdiagram@size - 1, \gotikz@currentdiagram@size - 1);
         \draw [very thick] (0, 0) rectangle (\gotikz@currentdiagram@size - 1, \gotikz@currentdiagram@size - 1);
 
         % hoshi
@@ -82,7 +84,10 @@
 
         % black stones
         \foreach \x/\y/\mark in \gotikz@currentdiagram@blackstones {
-            \filldraw [black] (\x,\y) circle [radius = 0.5cm - 0.5pt];
+            % \filldraw [black] (\x, \y) circle [radius = 0.5cm - 0.5pt];
+            \node [fill = black, draw = black, circle, minimum size = 1cm - 1pt, scale = 8cm / \gotikz@currentdiagram@size / 1cm, label = {[white, xscale = {min(1,height("0")/width("241"))}]center:241}] at (\x, \y) {};
+            % \draw [white] (\x,\y)+(90:0.5cm - 0.05cm) -- +(210:0.5cm - 0.05cm) -- +(330:0.5cm - 0.05cm) -- cycle;
+            % \node[regular polygon, regular polygon sides=3, minimum size = 0.9cm, scale = 8cm / \gotikz@currentdiagram@size / 1cm, draw = white] at (\x, \y) {};
         }
     \endtikzpicture
 }

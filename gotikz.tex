@@ -55,6 +55,12 @@
     \the\numexpr#1-1\relax/\the\numexpr#2-1\relax%
 }
 
+\def\gotikz@coordinates@equal#1/#2/#3/#4\iftrue{%
+    \ifnum 1=\numexpr 0%
+        \ifnum#1=#3
+            \ifnum#2=#4 1\fi\fi \relax
+}
+
 \def\black#1{%
     \foreach \stone in {#1} {%
         \edef\stone{\expandafter\gotikz@coordinates@convertletter\stone}%

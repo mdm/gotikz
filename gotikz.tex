@@ -61,6 +61,21 @@
             \ifnum#2=#4 1\fi\fi \relax
 }
 
+\def\gotikz@coordinates@contains#1#2\iftrue{%
+    \gdef\gotikz@coordinates@contains@found{0}
+
+    \foreach \coordinate in {#1} {%
+        \expandafter\gotikz@coordinates@equal\coordinate/#2\iftrue%
+            \gdef\gotikz@coordinates@contains@found{1}
+            \breakforeach
+        \fi
+    }
+
+    \ifnum 1=\numexpr\gotikz@coordinates@contains@found\relax
+}
+
+\def\mycontains#1#2{\gotikz@coordinates@contains{#1}{#2}}
+
 \def\black#1{%
     \foreach \stone in {#1} {%
         \edef\stone{\expandafter\gotikz@coordinates@convertletter\stone}%

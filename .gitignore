@@ -1,4 +1,8 @@
 *.pdf
 *.aux
 *.log
+docs/
+playground.fdb_latexmk
+playground.fls
+playground.synctex(busy)
 

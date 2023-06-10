@@ -29,39 +29,55 @@
 
 
 %\newcount\gotikz@tmpcounta
+%%% NEW
 
 \def\gotikz@empty{\gotikz@empty}
 
 \gdef\gotikz@currentdiagram@size{19}
 \gdef\gotikz@currentdiagram@blackstones{\gotikz@empty}
+\gdef\gotikz@currentdiagram@whitestones{\gotikz@empty}
 
 \def\gotikz@coordinates@letterinrange #1(#2-#3)\iftrue{%
-   \ifnum 1=\numexpr 0%
-      \ifnum`#1<\numexpr`#3+1\relax
-        \ifnum`#1>\numexpr`#2-1\relax 1\fi\fi \relax
+    \ifnum 1=\numexpr 0%
+        \ifnum`#1<\numexpr`#3+1\relax
+            \ifnum`#1>\numexpr`#2-1\relax 1\fi\fi \relax
 }
 
 \def\gotikz@coordinates@convertletter#1{%
-   \gotikz@coordinates@letterinrange#1(a-z)\iftrue \the\numexpr`#1-`a+1\relax-%
-   \else \gotikz@coordinates@letterinrange#1(A-Z)\iftrue \the\numexpr`#1-`A+27\relax-%
-         \else #1%
-   \fi\fi
+    \gotikz@coordinates@letterinrange#1(a-z)\iftrue \the\numexpr`#1-`a+1\relax-%
+    \else \gotikz@coordinates@letterinrange#1(A-Z)\iftrue \the\numexpr`#1-`A+27\relax-%
+        \else #1%
+    \fi\fi
 }
 
 
-\def\gotikz@coordinates@internalrepr#1-#2/#3/{%
-    \the\numexpr#1-1\relax/\the\numexpr#2-1\relax/#3%
+\def\gotikz@coordinates@internalrepr#1-#2/{%
+    \the\numexpr#1-1\relax/\the\numexpr#2-1\relax%
 }
 
 \def\black#1{%
     \foreach \stone in {#1} {%
         \edef\stone{\expandafter\gotikz@coordinates@convertletter\stone}%
-        \edef\stone{\expandafter\gotikz@coordinates@internalrepr\stone/none/}%
+        \edef\stone{\expandafter\gotikz@coordinates@internalrepr\stone/}%
         \xdef\gotikz@currentdiagram@blackstones{%
             \ifx\gotikz@currentdiagram@blackstones\gotikz@empty
                 \stone
             \else
                 \gotikz@currentdiagram@blackstones,\stone
+            \fi
+        }%
+    }%
+}
+
+\def\white#1{%
+    \foreach \stone in {#1} {%
+        \edef\stone{\expandafter\gotikz@coordinates@convertletter\stone}%
+        \edef\stone{\expandafter\gotikz@coordinates@internalrepr\stone/}%
+        \xdef\gotikz@currentdiagram@whitestones{%
+            \ifx\gotikz@currentdiagram@whitestones\gotikz@empty
+                \stone
+            \else
+                \gotikz@currentdiagram@whitestones,\stone
             \fi
         }%
     }%
@@ -76,18 +92,44 @@
         \draw [very thick] (0, 0) rectangle (\gotikz@currentdiagram@size - 1, \gotikz@currentdiagram@size - 1);
 
         % hoshi
-        \filldraw [black] (9, 9) circle [radius = 3pt];
         \filldraw [black] (3, 3) circle [radius = 3pt];
+        \filldraw [black] (3, 9) circle [radius = 3pt];
         \filldraw [black] (3, 15) circle [radius = 3pt];
+        \filldraw [black] (9, 3) circle [radius = 3pt];
+        \filldraw [black] (9, 9) circle [radius = 3pt];
+        \filldraw [black] (9, 15) circle [radius = 3pt];
         \filldraw [black] (15, 3) circle [radius = 3pt];
+        \filldraw [black] (15, 9) circle [radius = 3pt];
         \filldraw [black] (15, 15) circle [radius = 3pt];
 
         % black stones
-        \foreach \x/\y/\mark in \gotikz@currentdiagram@blackstones {
+        \foreach \x/\y in \gotikz@currentdiagram@blackstones {
             % \filldraw [black] (\x, \y) circle [radius = 0.5cm - 0.5pt];
             \node [fill = black, draw = black, circle, minimum size = 1cm - 1pt, scale = 8cm / \gotikz@currentdiagram@size / 1cm, label = {[white, xscale = {min(1,height("0")/width("241"))}]center:241}] at (\x, \y) {};
             % \draw [white] (\x,\y)+(90:0.5cm - 0.05cm) -- +(210:0.5cm - 0.05cm) -- +(330:0.5cm - 0.05cm) -- cycle;
             % \node[regular polygon, regular polygon sides=3, minimum size = 0.9cm, scale = 8cm / \gotikz@currentdiagram@size / 1cm, draw = white] at (\x, \y) {};
+
+            % triangle mark
+            % \draw [draw = black] (\x,\y)+(90:0.5cm - 0.05cm) -- +(210:0.5cm - 0.05cm) -- +(330:0.5cm - 0.05cm) -- cycle;
+
+            % square mark
+            % \draw [draw = black] (\x,\y)+(45:0.5cm - 0.05cm) -- +(135:0.5cm - 0.05cm) -- +(225:0.5cm - 0.05cm) -- +(315:0.5cm - 0.05cm) -- cycle;
+
+            % circle mark
+
+            % letter mark
+
+            % cross mark
+        }
+
+        % white stones
+        \foreach \x/\y/\mark in \gotikz@currentdiagram@whitestones {
+            \gotikz@coordinates@equal 0/0/\x/\y\iftrue
+                \node [fill = white, draw = red, circle, minimum size = 1cm - 1pt, scale = 8cm / \gotikz@currentdiagram@size / 1cm] at (\x, \y) {};
+            \else
+                \node [fill = white, draw = black, circle, minimum size = 1cm - 1pt, scale = 8cm / \gotikz@currentdiagram@size / 1cm] at (\x, \y) {};
+                \node [black, xscale = {min(1,height("0")/width("252"))}] at (\x, \y) {252};
+            \fi
         }
     \endtikzpicture
 }

@@ -64,44 +64,43 @@
 \def\gotikz@coordinates@contains#1#2\iftrue{%
     \gdef\gotikz@coordinates@contains@found{0}
 
+    \ifx#1\gotikz@empty\else
     \foreach \coordinate in {#1} {%
         \expandafter\gotikz@coordinates@equal\coordinate/#2\iftrue%
-            \gdef\gotikz@coordinates@contains@found{1}
+            \gdef\gotikz@coordinates@contains@found{1}% TODO: smuggle this value out instead of using a global
             \breakforeach
         \fi
     }
+    \fi
 
     \ifnum 1=\numexpr\gotikz@coordinates@contains@found\relax
 }
 
 \def\mycontains#1#2{\gotikz@coordinates@contains{#1}{#2}}
 
-\def\black#1{%
-    \foreach \stone in {#1} {%
+\def\gotikz@coordinates@addtolist#1#2{%
+    \foreach \stone in {#2} {%
         \edef\stone{\expandafter\gotikz@coordinates@convertletter\stone}%
         \edef\stone{\expandafter\gotikz@coordinates@internalrepr\stone/}%
-        \xdef\gotikz@currentdiagram@blackstones{%
-            \ifx\gotikz@currentdiagram@blackstones\gotikz@empty
+        \xdef#1{%
+            \ifx#1\gotikz@empty
                 \stone
             \else
-                \gotikz@currentdiagram@blackstones,\stone
+                #1,\stone
             \fi
         }%
     }%
 }
 
+
+\def\black#1{%
+    \gotikz@coordinates@addtolist\gotikz@currentdiagram@blackstones{#1}
+}
+
+\def\mylist{\gotikz@currentdiagram@blackstones}
+
 \def\white#1{%
-    \foreach \stone in {#1} {%
-        \edef\stone{\expandafter\gotikz@coordinates@convertletter\stone}%
-        \edef\stone{\expandafter\gotikz@coordinates@internalrepr\stone/}%
-        \xdef\gotikz@currentdiagram@whitestones{%
-            \ifx\gotikz@currentdiagram@whitestones\gotikz@empty
-                \stone
-            \else
-                \gotikz@currentdiagram@whitestones,\stone
-            \fi
-        }%
-    }%
+    \gotikz@coordinates@addtolist\gotikz@currentdiagram@whitestones{#1}
 }
 
 \def\showdiagram{%
@@ -124,34 +123,38 @@
         \filldraw [black] (15, 15) circle [radius = 3pt];
 
         % black stones
-        \foreach \x/\y in \gotikz@currentdiagram@blackstones {
-            % \filldraw [black] (\x, \y) circle [radius = 0.5cm - 0.5pt];
-            \node [fill = black, draw = black, circle, minimum size = 1cm - 1pt, scale = 8cm / \gotikz@currentdiagram@size / 1cm, label = {[white, xscale = {min(1,height("0")/width("241"))}]center:241}] at (\x, \y) {};
-            % \draw [white] (\x,\y)+(90:0.5cm - 0.05cm) -- +(210:0.5cm - 0.05cm) -- +(330:0.5cm - 0.05cm) -- cycle;
-            % \node[regular polygon, regular polygon sides=3, minimum size = 0.9cm, scale = 8cm / \gotikz@currentdiagram@size / 1cm, draw = white] at (\x, \y) {};
+        \ifx\gotikz@currentdiagram@blackstones\gotikz@empty\else
+            \foreach \x/\y in \gotikz@currentdiagram@blackstones {
+                % \filldraw [black] (\x, \y) circle [radius = 0.5cm - 0.5pt];
+                \node [fill = black, draw = black, circle, minimum size = 1cm - 1pt, scale = 8cm / \gotikz@currentdiagram@size / 1cm, label = {[white, xscale = {min(1,height("0")/width("241"))}]center:241}] at (\x, \y) {};
+                % \draw [white] (\x,\y)+(90:0.5cm - 0.05cm) -- +(210:0.5cm - 0.05cm) -- +(330:0.5cm - 0.05cm) -- cycle;
+                % \node[regular polygon, regular polygon sides=3, minimum size = 0.9cm, scale = 8cm / \gotikz@currentdiagram@size / 1cm, draw = white] at (\x, \y) {};
 
-            % triangle mark
-            % \draw [draw = black] (\x,\y)+(90:0.5cm - 0.05cm) -- +(210:0.5cm - 0.05cm) -- +(330:0.5cm - 0.05cm) -- cycle;
+                % triangle mark
+                % \draw [draw = black] (\x,\y)+(90:0.5cm - 0.05cm) -- +(210:0.5cm - 0.05cm) -- +(330:0.5cm - 0.05cm) -- cycle;
 
-            % square mark
-            % \draw [draw = black] (\x,\y)+(45:0.5cm - 0.05cm) -- +(135:0.5cm - 0.05cm) -- +(225:0.5cm - 0.05cm) -- +(315:0.5cm - 0.05cm) -- cycle;
+                % square mark
+                % \draw [draw = black] (\x,\y)+(45:0.5cm - 0.05cm) -- +(135:0.5cm - 0.05cm) -- +(225:0.5cm - 0.05cm) -- +(315:0.5cm - 0.05cm) -- cycle;
 
-            % circle mark
+                % circle mark
 
-            % letter mark
+                % letter mark
 
-            % cross mark
-        }
+                % cross mark
+            }
+        \fi
 
         % white stones
-        \foreach \x/\y/\mark in \gotikz@currentdiagram@whitestones {
-            \gotikz@coordinates@equal 0/0/\x/\y\iftrue
-                \node [fill = white, draw = red, circle, minimum size = 1cm - 1pt, scale = 8cm / \gotikz@currentdiagram@size / 1cm] at (\x, \y) {};
-            \else
-                \node [fill = white, draw = black, circle, minimum size = 1cm - 1pt, scale = 8cm / \gotikz@currentdiagram@size / 1cm] at (\x, \y) {};
-                \node [black, xscale = {min(1,height("0")/width("252"))}] at (\x, \y) {252};
-            \fi
-        }
+        \ifx\gotikz@currentdiagram@whitestones\gotikz@empty\else
+            \foreach \x/\y/\mark in \gotikz@currentdiagram@whitestones {
+                \gotikz@coordinates@equal 0/0/\x/\y\iftrue
+                    \node [fill = white, draw = red, circle, minimum size = 1cm - 1pt, scale = 8cm / \gotikz@currentdiagram@size / 1cm] at (\x, \y) {};
+                \else
+                    \node [fill = white, draw = black, circle, minimum size = 1cm - 1pt, scale = 8cm / \gotikz@currentdiagram@size / 1cm] at (\x, \y) {};
+                    \node [black, xscale = {min(1,height("0")/width("252"))}] at (\x, \y) {252};
+                \fi
+            }
+        \fi
     \endtikzpicture
 }
 

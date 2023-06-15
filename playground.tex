@@ -42,8 +42,11 @@
 a %a \pgfkeys{/gotikz/boardsize} b
 
 % \black{f12,A1,t19,k10,h8,i8,j8}
-\black{d4,16-16,k10}
+\black{d4,16-16,k10,b4,b8}
 \white{h8,i8,j8,i7,i9,a1}
+\addmarks[type=circle]{d4,k10,a2}
+\addmarks[type=square]{b4}
+\addmarks[type=triangle]{b8}
 \showdiagram
 
 % \mycontains{0/1,1/2,0/0}{1/2}\iftrue
@@ -53,6 +56,12 @@ yep
 nah
 \fi
 
-\mylist
+\mycontainstwo\iftrue
+yep
+\else
+nah
+\fi
+
+% \mylist
 
 \end{document}

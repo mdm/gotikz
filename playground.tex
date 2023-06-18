@@ -5,49 +5,19 @@
 \usepackage{gotikz}
 \usepackage[sfdefault,medium]{inter}
 
-%\def\mycol#1{\newtoks\coordinate \coordinate={#1} \def\myinnercol##1{##1} \myinnercol \the\coordinate}
-\def\myinner#1{%
-    \newcount\mycolumn%
-    \mycolumn \lccode`#1\relax%
-    \advance\mycolumn by -`a\relax%
-    \ifnum\mycolumn>8%
-        \advance\mycolumn by -1
-    \fi%
-    \newcount\myrow%
-    \myrow 19%
-    \advance\myrow by -%
-}
-\def\mycoordinate#1{\myinner#1 (\number\mycolumn, \number\myrow)}
-
 \begin{document}
 \blindtext
 
 \begin{figure}[h]
-\centering
-\begin{godiagram}[19]{8cm}
-\end{godiagram}
-\caption{a simple problem}
-\end{figure}
-
-\blindtext
-
-\mycoordinate{f12}
-\mycoordinate{A1}
-\mycoordinate{t19}
-\mycoordinate{k10}
-\mycoordinate{h8}
-\mycoordinate{i8}
-\mycoordinate{j8}
-
-a %a \pgfkeys{/gotikz/boardsize} b
-
 % \black{f12,A1,t19,k10,h8,i8,j8}
 \black{d4,16-16,k10,b4,b8}
 \white{h8,i8,j8,i7,i9,a1}
 \addmarks[type=circle]{d4,k10,a2}
 \addmarks[type=square]{b4}
-\addmarks[type=triangle]{b8}
+\addmarks{b8,16-16}
+\white[mark=circle]{16-4,16-5}
 \showdiagram
+\end{figure}
 
 % \mycontains{0/1,1/2,0/0}{1/2}\iftrue
 \mycontains{}{1/2}\iftrue

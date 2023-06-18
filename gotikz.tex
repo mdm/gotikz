@@ -1,40 +1,10 @@
 %\catcode`@=11%
 
-%%% appearrance
-\pgfkeys{/gotikz/boardsize/.default=19}
-\pgfkeys{/gotikz/stonesize/.default=1cm}
-\pgfkeys{/gotikz/linewidth/.default=1pt}
-\pgfkeys{/gotikz/borderwidth/.default=2pt}
-\pgfkeys{/gotikz/starpointsize/.default=6pt}
-\pgfkeys{/gotikz/cliprect/.default={(0,0),(18,18)}}
-
-%%% behaviour
-\pgfkeys{/gotikz/overwrite/.default=false}
-
-\pgfkeys{/gotikz/stones/.default={(5, 7)/white, (0, 18)/white, (18, 0)/white, (9, 9)/white, (7, 11)/black, (8, 11)/black, (8, 11)/black}}
-\pgfkeys{/gotikz/stones/.code=\def\mystones{#1}}
-%\pgfkeys{/gotikz/stones/.default={}}
-%\pgfkeys{/gotikz/marks/number}
-%\pgfkeys{/gotikz/marks/triangle}
-
-\def\gotikz@values@white{w}
-\def\gotikz@values@black{b}
-\def\gotikz@values@triangle{-1}
-\def\gotikz@values@square{-2}
-
-\def\gotikz@setstone#1#2#3#4{\expandafter\def\csname gotikz@stone@#1;#2;#3\endcsname{#4}}
-\def\gotikz@getstone#1#2#3{\csname gotikz@stone@#1;#2;#3\endcsname}
-\def\gotikz@setmark#1#2#3#4{\expandafter\def\csname gotikz@mark@#1;#2;#3\endcsname{#4}}
-\def\gotikz@getmark#1#2#3{\csname gotikz@mark@#1;#2;#3\endcsname}
-
-
-%\newcount\gotikz@tmpcounta
-%%% NEW
-
 \def\gotikz@empty{\gotikz@empty}
-\def\gotikz@marks@triangle{0}
-\def\gotikz@marks@square{1}
-\def\gotikz@marks@circle{2}
+\def\gotikz@marks@none{0}
+\def\gotikz@marks@triangle{1}
+\def\gotikz@marks@square{2}
+\def\gotikz@marks@circle{3}
 
 \gdef\gotikz@currentdiagram@size{19}% TODO: doesn't need to be global
 \gdef\gotikz@currentdiagram@blackstones{\gotikz@empty}
@@ -75,7 +45,6 @@
 
     \ifx#1\gotikz@empty\else
     \foreach \coordinate in #1 {%
-        \wlog{COORD: \coordinate  AND #2}
         \expandafter\gotikz@coordinates@equal\coordinate/#2\iftrue%
             \gdef\gotikz@coordinates@contains@found{1}% TODO: smuggle this value out instead of using a global
             \breakforeach
@@ -107,19 +76,55 @@
     }%
 }
 
-
-\def\black#1{%
-    \gotikz@coordinates@addtolist\gotikz@currentdiagram@blackstones{#1}
+\def\gotikz@utils@ifnextchar#1#2#3{%
+    \let\gotikz@utils@ifnextchar@char=#1%
+    \def\gotikz@utils@ifnextchar@yesoption{#2}%
+    \def\gotikz@utils@ifnextchar@nooption{#3}%
+    \futurelet\gotikz@utils@ifnextchar@nexttoken\gotikz@utils@ifnextchar@choose
 }
 
-% \def\mylist{\gotikz@currentdiagram@marks@coordinates}
+\def\gotikz@utils@ifnextchar@choose{%
+    \ifx\gotikz@utils@ifnextchar@nexttoken\gotikz@utils@ifnextchar@char%
+        \let\gotikz@utils@ifnextchar@choice\gotikz@utils@ifnextchar@yesoption%
+    \else%  
+        \let\gotikz@utils@ifnextchar@choice\gotikz@utils@ifnextchar@nooption%
+    \fi%
+    \gotikz@utils@ifnextchar@choice%
+}
 
-\def\white#1{%
-    \gotikz@coordinates@addtolist\gotikz@currentdiagram@whitestones{#1}
+\def\black{%
+    \gotikz@utils@ifnextchar[{\gotikz@addstones@withoptions\gotikz@currentdiagram@blackstones}{\gotikz@addstones@nooptions\gotikz@currentdiagram@blackstones}%
+}
+
+\def\white{%
+    \gotikz@utils@ifnextchar[{\gotikz@addstones@withoptions\gotikz@currentdiagram@whitestones}{\gotikz@addstones@nooptions\gotikz@currentdiagram@whitestones}%
 }
 
 \pgfkeys{%
-    /gotikz/mark/@selected/.initial=\gotikz@marks@triangle,
+    /gotikz/stone/mark/.is choice,
+    /gotikz/stone/mark/triangle/.style={/gotikz/mark/type=triangle},
+    /gotikz/stone/mark/square/.style={/gotikz/mark/type=square},
+    /gotikz/stone/mark/circle/.style={/gotikz/mark/type=circle},
+}
+
+\def\gotikz@addstones@withoptions#1[#2]#3{%
+    \pgfkeys{/gotikz/stone/.cd,#2}{%
+        \gotikz@coordinates@addtolist#1{#3}
+        \ifx\gotikz@marks@selected\gotikz@marks@none\else
+            \gotikz@coordinates@addtolist\gotikz@currentdiagram@marks@coordinates{#3}
+            \foreach \stone in {#3} {%
+                \gotikz@utils@addtolist\gotikz@currentdiagram@marks@values\gotikz@marks@selected
+            }
+        \fi            
+    }
+}
+
+\def\gotikz@addstones@nooptions#1#2{%
+    \gotikz@addstones@withoptions#1[]{#2}
+}
+
+\pgfkeys{%
+    /gotikz/mark/@selected/.initial=\gotikz@marks@none,
     /gotikz/mark/@selected/.get=\gotikz@marks@selected,
     /gotikz/mark/@selected/.store in=\gotikz@marks@selected,
     /gotikz/mark/type/.is choice,
@@ -129,9 +134,7 @@
 }
 
 \def\gotikz@addmarks@withoptions[#1]#2{%
-    \wlog{WITHOPTIONS: (#1)(#2)}
-    \wlog{\pgfkeysvalueof{/gotikz/mark/@selected},\gotikz@marks@selected}
-    \pgfkeys{/gotikz/mark/.cd,#1}{%
+    \pgfkeys{/gotikz/mark/.cd,type=triangle,#1}{%
         \gotikz@coordinates@addtolist\gotikz@currentdiagram@marks@coordinates{#2}
         \foreach \ignore in {#2}{%
             \gotikz@utils@addtolist\gotikz@currentdiagram@marks@values\gotikz@marks@selected
@@ -140,21 +143,12 @@
 }
 
 \def\gotikz@addmarks@nooptions#1{%
-    \wlog{NOOPTIONS: (#1)}
     \gotikz@addmarks@withoptions[]{#1}
 }
 
-\def\gotikz@addmarks@chooseaction{%
-    \ifx\gotikz@addmarks@nexttoken[%
-        \wlog{CHOOSEACTION: YES}
-        \expandafter\gotikz@addmarks@withoptions
-    \else
-        \wlog{CHOOSEACTION: NO}
-        \expandafter\gotikz@addmarks@nooptions
-    \fi
+\def\addmarks{%
+    \gotikz@utils@ifnextchar[{\gotikz@addmarks@withoptions}{\gotikz@addmarks@nooptions}%
 }
-
-\def\addmarks{\futurelet\gotikz@addmarks@nexttoken\gotikz@addmarks@chooseaction}
 
 \def\showdiagram{%
     \tikzpicture[scale = 8cm / \gotikz@currentdiagram@size / 1cm]
@@ -193,7 +187,7 @@
                     \node [fill = white, draw = red, circle, minimum size = 1cm - 1pt, scale = 8cm / \gotikz@currentdiagram@size / 1cm] at (\x, \y) {};
                 \else
                     \node [fill = white, draw = black, circle, minimum size = 1cm - 1pt, scale = 8cm / \gotikz@currentdiagram@size / 1cm] at (\x, \y) {};
-                    \node [black, xscale = {min(1,height("0")/width("252"))}] at (\x, \y) {252};
+                    % \node [black, xscale = {min(1,height("0")/width("252"))}] at (\x, \y) {252};
                 \fi
             }
         \fi
@@ -210,7 +204,7 @@
                     \fi
                     \ifx\type\gotikz@marks@circle
                         % \draw [fill = black, draw = white] (\x,\y) circle (cos(45) * (0.5cm - 0.1cm));
-                        \draw [fill = black, draw = white] (\x,\y) circle (0.28cm);
+                        \draw [fill = black, draw = white] (\x,\y) circle (0.2828cm);
                     \fi
                 \else
                     \ifx\type\gotikz@marks@triangle
@@ -220,7 +214,7 @@
                         \draw [fill = white, draw = black] (\x,\y)+(45:0.5cm - 0.1cm) -- +(135:0.5cm - 0.1cm) -- +(225:0.5cm - 0.1cm) -- +(315:0.5cm - 0.1cm) -- cycle;
                     \fi
                     \ifx\type\gotikz@marks@circle
-                        \draw [fill = white, draw = black] (\x,\y) circle (0.28cm);
+                        \draw [fill = white, draw = black] (\x,\y) circle (0.2828cm);
                     \fi
                 \fi
             }

@@ -101,14 +101,15 @@
 }
 
 \pgfkeys{%
-    /gotikz/stone/mark/.is choice,
-    /gotikz/stone/mark/triangle/.style={/gotikz/mark/type=triangle},
-    /gotikz/stone/mark/square/.style={/gotikz/mark/type=square},
-    /gotikz/stone/mark/circle/.style={/gotikz/mark/type=circle},
+    /gotikz/stone/marked/.is choice,
+    /gotikz/stone/marked/.default=triangle,
+    /gotikz/stone/marked/triangle/.style={/gotikz/mark/type=triangle},
+    /gotikz/stone/marked/square/.style={/gotikz/mark/type=square},
+    /gotikz/stone/marked/circle/.style={/gotikz/mark/type=circle},
 }
 
 \def\gotikz@addstones@withoptions#1[#2]#3{%
-    \pgfkeys{/gotikz/stone/.cd,#2}{%
+    \pgfkeys{/gotikz/mark/@selected=\gotikz@marks@none,/gotikz/stone/.cd,#2}{%
         \gotikz@coordinates@addtolist#1{#3}
         \ifx\gotikz@marks@selected\gotikz@marks@none\else
             \gotikz@coordinates@addtolist\gotikz@currentdiagram@marks@coordinates{#3}
@@ -194,7 +195,7 @@
 
         % marks
         \ifx\gotikz@currentdiagram@marks@coordinates\gotikz@empty\else
-            \foreach \x/\y [count=\c,evaluate=\c as \type using {{\gotikz@currentdiagram@marks@values}[\c-1]}] in \gotikz@currentdiagram@marks@coordinates {%
+           \foreach \x/\y [count=\c,evaluate=\c as \type using {{\gotikz@currentdiagram@marks@values}[\c-1]}] in \gotikz@currentdiagram@marks@coordinates {%
                 \gotikz@coordinates@contains{\gotikz@currentdiagram@blackstones}{\x/\y}\iftrue
                     \ifx\type\gotikz@marks@triangle
                         \draw [fill = black, draw = white] (\x,\y)+(90:0.5cm - 0.1cm) -- +(210:0.5cm - 0.1cm) -- +(330:0.5cm - 0.1cm) -- cycle;

@@ -1,6 +1,8 @@
 %\catcode`@=11%
 
 \def\gotikz@empty{\gotikz@empty}
+\def\gotikz@colors@black{b}
+\def\gotikz@colors@white{w}
 \def\gotikz@marks@none{0}
 \def\gotikz@marks@triangle{1}
 \def\gotikz@marks@square{2}
@@ -101,23 +103,25 @@
 }
 
 \pgfkeys{%
-    /gotikz/stone/marked/.is choice,
-    /gotikz/stone/marked/.default=triangle,
-    /gotikz/stone/marked/triangle/.style={/gotikz/mark/type=triangle},
-    /gotikz/stone/marked/square/.style={/gotikz/mark/type=square},
-    /gotikz/stone/marked/circle/.style={/gotikz/mark/type=circle},
+    /gotikz/stones/marked/.is choice,
+    /gotikz/stones/marked/.default=triangle,
+    /gotikz/stones/marked/triangle/.style={/gotikz/marks/type=triangle},
+    /gotikz/stones/marked/square/.style={/gotikz/marks/type=square},
+    /gotikz/stones/marked/circle/.style={/gotikz/marks/type=circle},
 }
 
 \def\gotikz@addstones@withoptions#1[#2]#3{%
-    \pgfkeys{/gotikz/mark/@selected=\gotikz@marks@none,/gotikz/stone/.cd,#2}{%
-        \gotikz@coordinates@addtolist#1{#3}
-        \ifx\gotikz@marks@selected\gotikz@marks@none\else
-            \gotikz@coordinates@addtolist\gotikz@currentdiagram@marks@coordinates{#3}
-            \foreach \stone in {#3} {%
-                \gotikz@utils@addtolist\gotikz@currentdiagram@marks@values\gotikz@marks@selected
-            }
-        \fi            
-    }
+    {%
+        \pgfkeys{/gotikz/stones/.cd,#2}{%
+            \gotikz@coordinates@addtolist#1{#3}
+            \ifx\gotikz@marks@selected\gotikz@marks@none\else
+                \gotikz@coordinates@addtolist\gotikz@currentdiagram@marks@coordinates{#3}
+                \foreach \stone in {#3} {%
+                    \gotikz@utils@addtolist\gotikz@currentdiagram@marks@values\gotikz@marks@selected
+                }
+            \fi            
+        }
+    }%
 }
 
 \def\gotikz@addstones@nooptions#1#2{%
@@ -125,22 +129,24 @@
 }
 
 \pgfkeys{%
-    /gotikz/mark/@selected/.initial=\gotikz@marks@none,
-    /gotikz/mark/@selected/.get=\gotikz@marks@selected,
-    /gotikz/mark/@selected/.store in=\gotikz@marks@selected,
-    /gotikz/mark/type/.is choice,
-    /gotikz/mark/type/triangle/.style={/gotikz/mark/@selected=\gotikz@marks@triangle},
-    /gotikz/mark/type/square/.style={/gotikz/mark/@selected=\gotikz@marks@square},
-    /gotikz/mark/type/circle/.style={/gotikz/mark/@selected=\gotikz@marks@circle},
+    /gotikz/marks/@selected/.initial=\gotikz@marks@none,
+    /gotikz/marks/@selected/.get=\gotikz@marks@selected,
+    /gotikz/marks/@selected/.store in=\gotikz@marks@selected,
+    /gotikz/marks/type/.is choice,
+    /gotikz/marks/type/triangle/.style={/gotikz/marks/@selected=\gotikz@marks@triangle},
+    /gotikz/marks/type/square/.style={/gotikz/marks/@selected=\gotikz@marks@square},
+    /gotikz/marks/type/circle/.style={/gotikz/marks/@selected=\gotikz@marks@circle},
 }
 
 \def\gotikz@addmarks@withoptions[#1]#2{%
-    \pgfkeys{/gotikz/mark/.cd,type=triangle,#1}{%
-        \gotikz@coordinates@addtolist\gotikz@currentdiagram@marks@coordinates{#2}
-        \foreach \ignore in {#2}{%
-            \gotikz@utils@addtolist\gotikz@currentdiagram@marks@values\gotikz@marks@selected
+    {%
+        \pgfkeys{/gotikz/marks/.cd,type=triangle,#1}{%
+            \gotikz@coordinates@addtolist\gotikz@currentdiagram@marks@coordinates{#2}
+            \foreach \ignore in {#2}{%
+                \gotikz@utils@addtolist\gotikz@currentdiagram@marks@values\gotikz@marks@selected
+            }
         }
-    }
+    }%
 }
 
 \def\gotikz@addmarks@nooptions#1{%
@@ -149,6 +155,50 @@
 
 \def\addmarks{%
     \gotikz@utils@ifnextchar[{\gotikz@addmarks@withoptions}{\gotikz@addmarks@nooptions}%
+}
+
+\pgfkeys{%
+    /gotikz/moves/@color/.initial=\gotikz@colors@black,
+    /gotikz/moves/@color/.get=\gotikz@colors@current,
+    /gotikz/moves/@color/.store in=\gotikz@colors@current,
+    /gotikz/moves/sente/.is choice,
+    /gotikz/moves/sente/black/.style={/gotikz/moves/@color=\gotikz@colors@black},
+    /gotikz/moves/sente/white/.style={/gotikz/moves/@color=\gotikz@colors@white},
+    /gotikz/moves/numbered/.initial=0,
+    /gotikz/moves/numbered/.get=\gotikz@numbers@current,
+    /gotikz/moves/numbered/.store in=\gotikz@numbers@current,
+    /gotikz/moves/numbered/.default=1,
+}
+
+\def\gotikz@addmoves@withoptions[#1]#2{%
+    {%
+        \pgfkeys{/gotikz/moves/.cd,#1}{%
+            \xdef\gotikz@tmp@color{\gotikz@colors@current}
+            \foreach \stone [count=\movenum from \gotikz@numbers@current] in {#2} {
+                \edef\stone{\expandafter\gotikz@coordinates@convertletter\stone}%
+                \edef\stone{\expandafter\gotikz@coordinates@internalrepr\stone/}%
+                \ifx\gotikz@tmp@color\gotikz@colors@black
+                    \gotikz@utils@addtolist\gotikz@currentdiagram@blackstones\stone
+                    \xdef\gotikz@tmp@color{\gotikz@colors@white}
+                \else
+                    \gotikz@utils@addtolist\gotikz@currentdiagram@whitestones\stone
+                    \xdef\gotikz@tmp@color{\gotikz@colors@black}
+                \fi
+                \ifnum 0<\numexpr\gotikz@numbers@current\relax
+                    \gotikz@utils@addtolist\gotikz@currentdiagram@numbers@coordinates\stone
+                    \gotikz@utils@addtolist\gotikz@currentdiagram@numbers@values\movenum
+                \fi
+            }
+        }
+    }%
+}
+
+\def\gotikz@addmoves@nooptions#1{%
+    \gotikz@addmoves@withoptions[]{#1}
+}
+
+\def\moves{%
+    \gotikz@utils@ifnextchar[{\gotikz@addmoves@withoptions}{\gotikz@addmoves@nooptions}%
 }
 
 \def\showdiagram{%
@@ -217,6 +267,17 @@
                     \ifx\type\gotikz@marks@circle
                         \draw [fill = white, draw = black] (\x,\y) circle (0.2828cm);
                     \fi
+                \fi
+            }
+        \fi
+
+        % numbers
+        \ifx\gotikz@currentdiagram@numbers@coordinates\gotikz@empty\else
+            \foreach \x/\y [count=\c,evaluate=\c as \movenum using {{\gotikz@currentdiagram@numbers@values}[\c-1]}] in \gotikz@currentdiagram@numbers@coordinates {%
+                \gotikz@coordinates@contains{\gotikz@currentdiagram@blackstones}{\x/\y}\iftrue
+                    \node [white, xscale = {min(1,height("0")/width(\movenum))}] at (\x, \y) {\movenum};
+                \else
+                    \node [black, xscale = {min(1,height("0")/width(\movenum))}] at (\x, \y) {\movenum};
                 \fi
             }
         \fi

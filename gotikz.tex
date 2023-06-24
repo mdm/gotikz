@@ -201,6 +201,44 @@
     \gotikz@utils@ifnextchar[{\gotikz@addmoves@withoptions}{\gotikz@addmoves@nooptions}%
 }
 
+\pgfkeys{%
+    /gotikz/labels/@increment/.is if=incrementlabel,
+    /gotikz/labels/@increment/.initial=true,
+    /gotikz/labels/symbol/.initial=A,
+    /gotikz/labels/symbol/.get=\gotikz@labels@current,
+    /gotikz/labels/symbol/.store in=\gotikz@labels@current,
+    /gotikz/labels/progression/.is choice,
+    /gotikz/labels/progression/sequence/.style={/gotikz/labels/@increment=true},
+    /gotikz/labels/progression/repeat/.style={/gotikz/labels/@increment=false},
+}
+
+\def\gotikz@utils@nextletter#1{\expandafter\gotikz@utils@donextletter\expandafter{#1}}
+\def\gotikz@utils@donextletter#1{\ifnum`#1=122 \else\Uchar\numexpr`#1+1\relax\fi}
+
+\def\gotikz@addlabels@withoptions[#1]#2{%
+    {%
+        \newif\ifincrementlabel
+        \pgfkeys{/gotikz/labels/.cd,#1}{%
+            \xdef\gotikz@tmp@label{\gotikz@labels@current}
+            \gotikz@coordinates@addtolist\gotikz@currentdiagram@labels@coordinates{#2}
+            \foreach \ignore in {#2}{%
+                \gotikz@utils@addtolist\gotikz@currentdiagram@labels@values{\gotikz@tmp@label}
+                \ifincrementlabel
+                    \xdef\gotikz@tmp@label{\gotikz@utils@nextletter\gotikz@tmp@label}
+                \fi
+            }
+        }
+    }%
+}
+
+\def\gotikz@addlabels@nooptions#1{%
+    \gotikz@addlabels@withoptions[]{#1}
+}
+
+\def\addlabels{%
+    \gotikz@utils@ifnextchar[{\gotikz@addlabels@withoptions}{\gotikz@addlabels@nooptions}%
+}
+
 \def\showdiagram{%
     \tikzpicture[scale = 8cm / \gotikz@currentdiagram@size / 1cm]
     % \tikzpicture
@@ -279,6 +317,26 @@
                 \else
                     \node [black, xscale = {min(1,height("0")/width(\movenum))}] at (\x, \y) {\movenum};
                 \fi
+            }
+        \fi
+
+        % labels
+        \ifx\gotikz@currentdiagram@labels@coordinates\gotikz@empty\else
+            \foreach \x/\y [count=\ci] in \gotikz@currentdiagram@labels@coordinates {%
+                \foreach \label [count=\cj] in \gotikz@currentdiagram@labels@values {%
+                    \ifnum \ci=\cj%
+                        \gotikz@coordinates@contains{\gotikz@currentdiagram@blackstones}{\x/\y}\iftrue
+                            \node [white] at (\x, \y) {\label};
+                        \else
+                            \gotikz@coordinates@contains{\gotikz@currentdiagram@whitestones}{\x/\y}\iftrue
+                                \node [black] at (\x, \y) {\label};
+                            \else
+                                \node [fill=white, circle, minimum size = 1cm - 1pt, scale = 8cm / \gotikz@currentdiagram@size / 1cm] at (\x, \y) {};
+                                \node [black] at (\x, \y) {\label};
+                            \fi
+                        \fi
+                    \fi
+                }
             }
         \fi
     \endtikzpicture

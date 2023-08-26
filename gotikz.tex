@@ -201,9 +201,10 @@
     \gotikz@utils@ifnextchar[{\gotikz@addmoves@withoptions}{\gotikz@addmoves@nooptions}%
 }
 
+\newif\ifincrementlabel
 \pgfkeys{%
     /gotikz/labels/@increment/.is if=incrementlabel,
-    /gotikz/labels/@increment/.initial=true,
+    /gotikz/labels/@increment=true,
     /gotikz/labels/symbol/.initial=A,
     /gotikz/labels/symbol/.get=\gotikz@labels@current,
     /gotikz/labels/symbol/.store in=\gotikz@labels@current,
@@ -212,19 +213,32 @@
     /gotikz/labels/progression/repeat/.style={/gotikz/labels/@increment=false},
 }
 
-\def\gotikz@utils@nextletter#1{\expandafter\gotikz@utils@donextletter\expandafter{#1}}
-\def\gotikz@utils@donextletter#1{\ifnum`#1=122 \else\Uchar\numexpr`#1+1\relax\fi}
+\def\gotikz@lowercaseletters{abcdefghijklmnopqrstuvwxy}
+\def\gotikz@lowercaseshifted{bcdefghijklmnopqrstuvwxyz}
+\def\gotikz@uppercaseletters{ABCDEFGHIJKLMNOPQRSTUVWXY}
+\def\gotikz@uppercaseshifted{BCDEFGHIJKLMNOPQRSTUVWXYZ}
+
+\def\gotikz@utils@nextletter#1{%
+    \StrPosition{\gotikz@lowercaseletters}{#1}[\gotikz@tmp@charindex]%
+    \ifnum\gotikz@tmp@charindex>0%
+        \StrChar{\gotikz@lowercaseshifted}{\gotikz@tmp@charindex}[#1]%
+    \fi%
+    \StrPosition{\gotikz@uppercaseletters}{#1}[\gotikz@tmp@charindex]%
+    \ifnum\gotikz@tmp@charindex>0%
+        \StrChar{\gotikz@uppercaseshifted}{\gotikz@tmp@charindex}[#1]%
+    \fi%
+}
 
 \def\gotikz@addlabels@withoptions[#1]#2{%
     {%
-        \newif\ifincrementlabel
         \pgfkeys{/gotikz/labels/.cd,#1}{%
             \xdef\gotikz@tmp@label{\gotikz@labels@current}
             \gotikz@coordinates@addtolist\gotikz@currentdiagram@labels@coordinates{#2}
             \foreach \ignore in {#2}{%
                 \gotikz@utils@addtolist\gotikz@currentdiagram@labels@values{\gotikz@tmp@label}
                 \ifincrementlabel
-                    \xdef\gotikz@tmp@label{\gotikz@utils@nextletter\gotikz@tmp@label}
+                    \gotikz@utils@nextletter\gotikz@tmp@label
+                    \xdef\gotikz@tmp@label{\gotikz@tmp@label}
                 \fi
             }
         }

@@ -2,6 +2,7 @@
 
 \documentclass[a4paper]{article}  
 \usepackage{blindtext}
+\usepackage{xstring}
 \usepackage{gotikz}
 \usepackage[sfdefault,medium]{inter}
 
@@ -17,8 +18,9 @@
 \addmarks{b8,16-16}
 \white[marked]{16-4,16-5}
 \moves[sente=white,numbered=100]{15-3,16-3}
-\addlabels[symbol=A,progression=sequence]{3-17,4-16,5-15}
+\addlabels[symbol=A]{3-17,4-16,5-15}
 \addlabels[symbol=$\times$,progression=repeat]{6-14,7-13}
+\addlabels[symbol=g]{9-17,10-17,11-17}
 \showdiagram
 \end{figure}
 
